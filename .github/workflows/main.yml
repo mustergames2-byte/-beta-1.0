@@ -17,12 +17,11 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '11'
+        java-version: '17'
 
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.6'
         channel: 'stable'
 
     - name: Unpack and build
@@ -31,10 +30,23 @@ jobs:
         cd project_extracted/xiaomi_camera
         flutter clean
         flutter create --platforms android .
+        
+        # Настройка Gradle под требования библиотеки gal
+        sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle || true
+        sed -i 's/compileSdk .*/compileSdk 34/g' android/app/build.gradle || true
+        sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle || true
+        sed -i 's/minSdk .*/minSdk 21/g' android/app/build.gradle || true
+        
         flutter pub get
         flutter build apk --release --no-tree-shake-icons
         cp build/app/outputs/flutter-apk/app-release.apk ../../app-release.apk
 
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: app-release.apk
+        
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
