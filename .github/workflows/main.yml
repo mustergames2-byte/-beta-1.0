@@ -24,13 +24,12 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Unpack project and generate android folder
+    - name: Unpack and build
       run: |
         unzip xiaomi_camera.zip -d project_extracted
-        cd project_extracted
-        if [ -d "xiaomi_camera" ]; then cd xiaomi_camera; fi
+        cd project_extracted/xiaomi_camera
         flutter create --platforms android .
-        flutter pub get
+        flutter pub upgrade --major-versions
         flutter build apk --release
         cp build/app/outputs/flutter-apk/app-release.apk ../../app-release.apk
 
