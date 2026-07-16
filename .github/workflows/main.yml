@@ -31,7 +31,8 @@ jobs:
         flutter clean
         flutter create --platforms android .
         flutter pub get
-        flutter build apk --release --no-tree-shake-icons
+        # Сохраняем подробный лог ошибки, если сборка не удалась
+        flutter build apk --release --no-tree-shake-icons > build_log.txt 2>&1 || (cat build_log.txt && exit 1)
         cp build/app/outputs/flutter-apk/app-release.apk ../../app-release.apk
 
     - name: Upload APK Artifact
