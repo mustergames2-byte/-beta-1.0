@@ -28,9 +28,10 @@ jobs:
       run: |
         unzip xiaomi_camera.zip -d project_extracted
         cd project_extracted/xiaomi_camera
+        flutter clean
         flutter create --platforms android .
-        flutter pub upgrade --major-versions
-        flutter build apk --release
+        flutter pub get
+        flutter build apk --release --no-tree-shake-icons
         cp build/app/outputs/flutter-apk/app-release.apk ../../app-release.apk
 
     - name: Upload APK Artifact
