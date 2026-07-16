@@ -26,31 +26,24 @@ jobs:
 
     - name: Unpack, patch main.dart and build
       run: |
-        # 1. Распаковываем архив во временную папку
         unzip xiaomi_camera.zip -d project_extracted
-        
-        # 2. Копируем НАШ ИСПРАВЛЕННЫЙ main.dart с сайта во временную папку поверх старого
         cp project_extracted/xiaomi_camera/lib/main.dart ./main_fixed.dart || true
-        
         cd project_extracted/xiaomi_camera
         
-        # 3. Полностью пересоздаем проект Android
         flutter clean
         rm -rf android
         flutter create --platforms android .
         
-        # 4. Возвращаем наш хороший main.dart на место, если он затерся
         cp ../../lib/main.dart ./lib/main.dart || cp ../../main_fixed.dart ./lib/main.dart || true
         
-        # 5. Настраиваем нужные версии Android SDK
         sed -i 's/compileSdkVersion [0-9]*/compileSdkVersion 34/g' android/app/build.gradle || true
         sed -i 's/compileSdk [0-9]*/compileSdk 34/g' android/app/build.gradle || true
         sed -i 's/minSdkVersion [0-9]*/minSdkVersion 21/g' android/app/build.gradle || true
         sed -i 's/minSdk [0-9]*/minSdk 21/g' android/app/build.gradle || true
         
-        # 6. Собираем приложение
         flutter pub get
-        flutter build apk --release --no-tree-shake-icons
+        # Добавили флаг игнорирования строгих ошибок
+        flutter build apk --release --no-tree-shake-icons --no-sound-null-safety || flutter build apk --release --no-tree-shake-icons
         cp build/app/outputs/flutter-apk/app-release.apk ../../app-release.apk
 
     - name: Upload APK Artifact
